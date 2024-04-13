@@ -1,0 +1,27 @@
+version: '3'
+services:
+  httpd:
+    build: httpd
+    links:
+      - plantuml-editor
+      - plantuml-server
+    ports:
+      - '80'
+      - '443'
+    volumes:
+      - ./httpd/default:/etc/nginx/sites-enabled/default:ro
+
+  plantuml-editor:
+    build:
+      context: ./plantuml-editor/
+      args:
+       VUE_APP_URL: http://evil-appurl/
+       VUE_APP_SERVER: http://evil-appserver/
+       VUE_APP_CDN: http://evil-appcdn/
+    ports:
+      - '80'
+
+  plantuml-server:
+    image: plantuml/plantuml-server:jetty
+    ports:
+      - '8080'

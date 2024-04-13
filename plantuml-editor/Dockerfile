@@ -13,13 +13,32 @@ WORKDIR /usr/app
 #   - VUE_APP_SERVER will never used. (Drop it?)
 # See PR#19
 # https://github.com/kkeisuke/plantuml-editor/pull/19
-ARG VUE_APP_URL=https://plantuml-editor.kkeisuke.com/
-ARG VUE_APP_SERVER=https://plantuml-server.kkeisuke.dev/
-ARG VUE_APP_CDN=https://plantuml-server.kkeisuke.dev/
+ARG VUE_APP_URL
+ARG VUE_APP_SERVER
+ARG VUE_APP_CDN
 
 # build app
 RUN npm install && \
     npm run flow-typed && \
+    npm run build
+
+FROM node:12 AS builder2
+
+WORKDIR /plantuml-editor-build/
+COPY package.json .
+COPY package-lock.json .
+RUN --mount=type=cache,target=/root/.cache/,rw \
+    npm install
+
+COPY .flowconfig .
+RUN npm run flow-typed
+
+COPY . .
+
+
+RUN --mount=type=cache,target=/root/.cache/,rw \
+    npm install \
+    npm run flow-typed \
     npm run build
 
 # NGINX Alpine as minimal web server
