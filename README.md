@@ -5,7 +5,7 @@ Usage
 
 #### Start
 
-    docker-compose build --build -d
+    docker-compose up --build -d
 
 #### Connect
 
